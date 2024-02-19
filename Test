@@ -1,1 +1,515 @@
-H
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+class DbConnectorDaoImplTest {
+
+    private DbConnectorDaoImpl<Object> dbConnectorDao;
+
+    private EntityManager entityManager;
+    private Query query;
+
+    @BeforeEach
+    void setUp() {
+        entityManager = mock(EntityManager.class);
+        dbConnectorDao = new DbConnectorDaoImpl<>();
+        dbConnectorDao.setEntityManager(entityManager);
+
+        query = mock(Query.class);
+    }
+
+    @Test
+    void testGetDataQuery_Success() {
+        String queryString = "SELECT * FROM SomeTable";
+        Map<String, Object> params = new HashMap<>();
+        Map<String, String> inputValidation = new HashMap<>();
+
+        when(entityManager.createNativeQuery(queryString)).thenReturn(query);
+
+        List<Object> resultList = dbConnectorDao.getDataQuery(queryString, params, inputValidation);
+
+        assertNotNull(resultList);
+        // Add more assertions based on your requirements
+    }
+
+    @Test
+    void testGetDataQuery_InvalidQueryString() {
+        // Test when the queryString is null
+        assertThrows(CustomBadRequestException.class, () -> {
+            dbConnectorDao.getDataQuery(null, new HashMap<>(), new HashMap<>());
+        });
+
+        // Test when the queryString is empty
+        assertThrows(CustomBadRequestException.class, () -> {
+            dbConnectorDao.getDataQuery("", new HashMap<>(), new HashMap<>());
+        });
+
+        // Add more cases for invalid query strings
+    }
+
+    @Test
+    void testGetDataQuery_ExceptionDuringQueryCreation() {
+        String queryString = "SELECT * FROM SomeTable";
+        Map<String, Object> params = new HashMap<>();
+        Map<String, String> inputValidation = new HashMap<>();
+
+        when(entityManager.createNativeQuery(queryString)).thenThrow(new RuntimeException("Some exception"));
+
+        assertThrows(CustomException.class, () -> {
+            dbConnectorDao.getDataQuery(queryString, params, inputValidation);
+        });
+
+        // Add more assertions based on your requirements
+    }
+
+    // Add more test cases based on different scenarios and requirements
+}
+=======================================================================================================================================
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+class DbConnectorDaoImplTest {
+
+    private DbConnectorDaoImpl<Object> dbConnectorDao;
+
+    private EntityManager entityManager;
+    private Query query;
+
+    @BeforeEach
+    void setUp() {
+        entityManager = mock(EntityManager.class);
+        dbConnectorDao = new DbConnectorDaoImpl<>();
+        dbConnectorDao.setEntityManager(entityManager);
+
+        query = mock(Query.class);
+    }
+
+    @Test
+    void testGetDataQuery_Success() {
+        String queryString = "SELECT * FROM SomeTable";
+        Map<String, Object> params = new HashMap<>();
+        Map<String, String> inputValidation = new HashMap<>();
+
+        when(entityManager.createNativeQuery(queryString)).thenReturn(query);
+
+        List<Object> resultList = dbConnectorDao.getDataQuery(queryString, params, inputValidation);
+
+        assertNotNull(resultList);
+        // Add more assertions based on your requirements
+    }
+
+    @Test
+    void testGetDataQuery_InvalidQueryString() {
+        // Test when the queryString is null
+        CustomBadRequestException nullException = assertThrows(CustomBadRequestException.class, () -> {
+            dbConnectorDao.getDataQuery(null, new HashMap<>(), new HashMap<>());
+        });
+        assertEquals("Query string is not valid: 'null' or 'empty'", nullException.getMessage());
+
+        // Test when the queryString is empty
+        CustomBadRequestException emptyException = assertThrows(CustomBadRequestException.class, () -> {
+            dbConnectorDao.getDataQuery("", new HashMap<>(), new HashMap<>());
+        });
+        assertEquals("Query string is not valid: 'null' or 'empty'", emptyException.getMessage());
+
+        // Add more cases for invalid query strings
+    }
+
+    @Test
+    void testGetDataQuery_ExceptionDuringQueryCreation() {
+        String queryString = "SELECT * FROM SomeTable";
+        Map<String, Object> params = new HashMap<>();
+        Map<String, String> inputValidation = new HashMap<>();
+
+        when(entityManager.createNativeQuery(queryString)).thenThrow(new RuntimeException("Some exception"));
+
+        CustomException customException = assertThrows(CustomException.class, () -> {
+            dbConnectorDao.getDataQuery(queryString, params, inputValidation);
+        });
+        assertEquals("Unable to create the 'query' from the given 'queryString'", customException.getMessage());
+
+        // Add more assertions based on different exception scenarios
+    }
+
+    // Add more test cases for boundary conditions and exception messages
+}
+
+====================================================================================================================================
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+class DbConnectorServiceImplTest {
+
+    private DbConnectorServiceImpl<Object> dbConnectorService;
+    private DbConnectorDao<Object> dao;
+    private QueryResultHolder resultProperties;
+
+    @BeforeEach
+    void setUp() {
+        dao = mock(DbConnectorDao.class);
+        resultProperties = mock(QueryResultHolder.class);
+
+        dbConnectorService = new DbConnectorServiceImpl<>();
+        dbConnectorService.setDao(dao);
+        dbConnectorService.setResultProperties(resultProperties);
+    }
+
+    @Test
+    void testGetDataQuery_Success() {
+        RequestDto retrieveRequest = new RequestDto();
+        retrieveRequest.setCategory("category1");
+        retrieveRequest.setParams(new HashMap<>());
+        String sqlName = "validSqlName";
+
+        Properties properties = new Properties();
+        properties.setProperty("query", "SELECT * FROM SomeTable");
+        properties.setProperty("inputValidation", "inputValidation");
+        Map<String, Properties> propertiesMap = new HashMap<>();
+        propertiesMap.put("category1", properties);
+
+        Map<String, Map<String, Properties>> resultPropertiesMap = new HashMap<>();
+        resultPropertiesMap.put(sqlName, propertiesMap);
+
+        when(resultProperties.getPropertiesMap()).thenReturn(resultPropertiesMap);
+
+        List<Object> resultList = dbConnectorService.getDataQuery(retrieveRequest, sqlName);
+
+        assertNotNull(resultList);
+        // Add more assertions based on your requirements
+    }
+
+    @Test
+    void testGetDataQuery_InvalidSqlName() {
+        RequestDto retrieveRequest = new RequestDto();
+        retrieveRequest.setCategory("category1");
+        retrieveRequest.setParams(new HashMap<>());
+        String invalidSqlName = "invalidSqlName";
+
+        when(resultProperties.getPropertiesMap()).thenReturn(new HashMap<>());
+
+        CustomBadRequestException exception = assertThrows(CustomBadRequestException.class, () -> {
+            dbConnectorService.getDataQuery(retrieveRequest, invalidSqlName);
+        });
+        assertEquals("Provided 'sqlName' in the request URL is not valid", exception.getMessage());
+    }
+
+    // Add more test cases for invalid input, exception handling, etc.
+}
+
+===========================================================================================================================
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+class DbConnectorServiceImplTest {
+
+    private DbConnectorServiceImpl<Object> dbConnectorService;
+    private DbConnectorDao<Object> dao;
+    private QueryResultHolder resultProperties;
+
+    @BeforeEach
+    void setUp() {
+        dao = mock(DbConnectorDao.class);
+        resultProperties = mock(QueryResultHolder.class);
+
+        dbConnectorService = new DbConnectorServiceImpl<>();
+        dbConnectorService.setDao(dao);
+        dbConnectorService.setResultProperties(resultProperties);
+    }
+
+    @Test
+    void testGetDataQuery_Success() {
+        RequestDto retrieveRequest = new RequestDto();
+        retrieveRequest.setCategory("category1");
+        retrieveRequest.setParams(new HashMap<>());
+        String sqlName = "validSqlName";
+
+        Properties properties = new Properties();
+        properties.setProperty("query", "SELECT * FROM SomeTable");
+        properties.setProperty("inputValidation", "inputValidation");
+        Map<String, Properties> propertiesMap = new HashMap<>();
+        propertiesMap.put("category1", properties);
+
+        Map<String, Map<String, Properties>> resultPropertiesMap = new HashMap<>();
+        resultPropertiesMap.put(sqlName, propertiesMap);
+
+        when(resultProperties.getPropertiesMap()).thenReturn(resultPropertiesMap);
+
+        List<Object> resultList = dbConnectorService.getDataQuery(retrieveRequest, sqlName);
+
+        assertNotNull(resultList);
+        // Add more assertions based on your requirements
+    }
+
+    @Test
+    void testGetDataQuery_InvalidSqlName() {
+        RequestDto retrieveRequest = new RequestDto();
+        retrieveRequest.setCategory("category1");
+        retrieveRequest.setParams(new HashMap<>());
+        String invalidSqlName = "invalidSqlName";
+
+        when(resultProperties.getPropertiesMap()).thenReturn(new HashMap<>());
+
+        CustomBadRequestException exception = assertThrows(CustomBadRequestException.class, () -> {
+            dbConnectorService.getDataQuery(retrieveRequest, invalidSqlName);
+        });
+        assertEquals("Provided 'sqlName' in the request URL is not valid", exception.getMessage());
+    }
+
+    @Test
+    void testGetDataQuery_InvalidCategory() {
+        RequestDto retrieveRequest = new RequestDto();
+        retrieveRequest.setCategory("invalidCategory");
+        retrieveRequest.setParams(new HashMap<>());
+        String sqlName = "validSqlName";
+
+        Properties properties = new Properties();
+        properties.setProperty("query", "SELECT * FROM SomeTable");
+        properties.setProperty("inputValidation", "inputValidation");
+        Map<String, Properties> propertiesMap = new HashMap<>();
+        propertiesMap.put("category1", properties);
+
+        Map<String, Map<String, Properties>> resultPropertiesMap = new HashMap<>();
+        resultPropertiesMap.put(sqlName, propertiesMap);
+
+        when(resultProperties.getPropertiesMap()).thenReturn(resultPropertiesMap);
+
+        CustomBadRequestException exception = assertThrows(CustomBadRequestException.class, () -> {
+            dbConnectorService.getDataQuery(retrieveRequest, sqlName);
+        });
+        assertEquals("Invalid 'category' in the request. Available categories: [category1]", exception.getMessage());
+    }
+
+    @Test
+    void testGetDataQuery_NullParams() {
+        RequestDto retrieveRequest = new RequestDto();
+        retrieveRequest.setCategory("category1");
+        retrieveRequest.setParams(null);
+        String sqlName = "validSqlName";
+
+        Properties properties = new Properties();
+        properties.setProperty("query", "SELECT * FROM SomeTable");
+        properties.setProperty("inputValidation", "inputValidation");
+        Map<String, Properties> propertiesMap = new HashMap<>();
+        propertiesMap.put("category1", properties);
+
+        Map<String, Map<String, Properties>> resultPropertiesMap = new HashMap<>();
+        resultPropertiesMap.put(sqlName, propertiesMap);
+
+        when(resultProperties.getPropertiesMap()).thenReturn(resultPropertiesMap);
+
+        CustomBadRequestException exception = assertThrows(CustomBadRequestException.class, () -> {
+            dbConnectorService.getDataQuery(retrieveRequest, sqlName);
+        });
+        assertEquals("Request parameters are null", exception.getMessage());
+    }
+
+    @Test
+    void testGetDataQuery_ExceptionFromDao() {
+        RequestDto retrieveRequest = new RequestDto();
+        retrieveRequest.setCategory("category1");
+        retrieveRequest.setParams(new HashMap<>());
+        String sqlName = "validSqlName";
+
+        Properties properties = new Properties();
+        properties.setProperty("query", "SELECT * FROM SomeTable");
+        properties.setProperty("inputValidation", "inputValidation");
+        Map<String, Properties> propertiesMap = new HashMap<>();
+        propertiesMap.put("category1", properties);
+
+        Map<String, Map<String, Properties>> resultPropertiesMap = new HashMap<>();
+        resultPropertiesMap.put(sqlName, propertiesMap);
+
+        when(resultProperties.getPropertiesMap()).thenReturn(resultPropertiesMap);
+        when(dao.getDataQuery(any(), any(), any())).thenThrow(new CustomException("Custom exception from DAO"));
+
+        CustomException exception = assertThrows(CustomException.class, () -> {
+            dbConnectorService.getDataQuery(retrieveRequest, sqlName);
+        });
+        assertEquals("Custom exception from DAO", exception.getMessage());
+    }
+
+    // Add more test cases for different scenarios and requirements
+}
+
+====================================================================================================================================
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+class DbConnectorServiceImplTest {
+
+    private DbConnectorServiceImpl<Object> dbConnectorService;
+    private DbConnectorDao<Object> dao;
+    private QueryResultHolder resultProperties;
+
+    @BeforeEach
+    void setUp() {
+        dao = mock(DbConnectorDao.class);
+        resultProperties = mock(QueryResultHolder.class);
+
+        dbConnectorService = new DbConnectorServiceImpl<>();
+        dbConnectorService.setDao(dao);
+        dbConnectorService.setResultProperties(resultProperties);
+    }
+
+    @Test
+    void testCreateOrUpdateDataQuery_Success() {
+        RequestDto createUpdateRequest = new RequestDto();
+        createUpdateRequest.setCategory("category1");
+        createUpdateRequest.setParams(new HashMap<>());
+        String sqlName = "validSqlName";
+
+        Properties properties = new Properties();
+        properties.setProperty("query", "UPDATE SomeTable SET column = :value");
+        properties.setProperty("inputValidation", "inputValidation");
+        Map<String, Properties> propertiesMap = new HashMap<>();
+        propertiesMap.put("category1", properties);
+
+        Map<String, Map<String, Properties>> resultPropertiesMap = new HashMap<>();
+        resultPropertiesMap.put(sqlName, propertiesMap);
+
+        when(resultProperties.getPropertiesMap()).thenReturn(resultPropertiesMap);
+        when(dao.createOrUpdateDataQuery(any(), any(), any())).thenReturn(1);
+
+        int result = dbConnectorService.createOrUpdateDataQuery(createUpdateRequest, sqlName);
+
+        assertEquals(1, result);
+        // Add more assertions based on your requirements
+    }
+
+    @Test
+    void testCreateOrUpdateDataQuery_InvalidSqlName() {
+        RequestDto createUpdateRequest = new RequestDto();
+        createUpdateRequest.setCategory("category1");
+        createUpdateRequest.setParams(new HashMap<>());
+        String invalidSqlName = "invalidSqlName";
+
+        when(resultProperties.getPropertiesMap()).thenReturn(new HashMap<>());
+
+        CustomBadRequestException exception = assertThrows(CustomBadRequestException.class, () -> {
+            dbConnectorService.createOrUpdateDataQuery(createUpdateRequest, invalidSqlName);
+        });
+        assertEquals("Provided 'sqlName' in the request URL is not valid", exception.getMessage());
+    }
+
+    @Test
+    void testCreateOrUpdateDataQuery_InvalidCategory() {
+        RequestDto createUpdateRequest = new RequestDto();
+        createUpdateRequest.setCategory("invalidCategory");
+        createUpdateRequest.setParams(new HashMap<>());
+        String sqlName = "validSqlName";
+
+        Properties properties = new Properties();
+        properties.setProperty("query", "UPDATE SomeTable SET column = :value");
+        properties.setProperty("inputValidation", "inputValidation");
+        Map<String, Properties> propertiesMap = new HashMap<>();
+        propertiesMap.put("category1", properties);
+
+        Map<String, Map<String, Properties>> resultPropertiesMap = new HashMap<>();
+        resultPropertiesMap.put(sqlName, propertiesMap);
+
+        when(resultProperties.getPropertiesMap()).thenReturn(resultPropertiesMap);
+
+        CustomBadRequestException exception = assertThrows(CustomBadRequestException.class, () -> {
+            dbConnectorService.createOrUpdateDataQuery(createUpdateRequest, sqlName);
+        });
+        assertEquals("Invalid 'category' in the request. Available categories: [category1]", exception.getMessage());
+    }
+
+    @Test
+    void testCreateOrUpdateDataQuery_NullParams() {
+        RequestDto createUpdateRequest = new RequestDto();
+        createUpdateRequest.setCategory("category1");
+        createUpdateRequest.setParams(null);
+        String sqlName = "validSqlName";
+
+        Properties properties = new Properties();
+        properties.setProperty("query", "UPDATE SomeTable SET column = :value");
+        properties.setProperty("inputValidation", "inputValidation");
+        Map<String, Properties> propertiesMap = new HashMap<>();
+        propertiesMap.put("category1", properties);
+
+        Map<String, Map<String, Properties>> resultPropertiesMap = new HashMap<>();
+        resultPropertiesMap.put(sqlName, propertiesMap);
+
+        when(resultProperties.getPropertiesMap()).thenReturn(resultPropertiesMap);
+
+        CustomBadRequestException exception = assertThrows(CustomBadRequestException.class, () -> {
+            dbConnectorService.createOrUpdateDataQuery(createUpdateRequest, sqlName);
+        });
+        assertEquals("Request parameters are null", exception.getMessage());
+    }
+
+    @Test
+    void testCreateOrUpdateDataQuery_ExceptionFromDao() {
+        RequestDto createUpdateRequest = new RequestDto();
+        createUpdateRequest.setCategory("category1");
+        createUpdateRequest.setParams(new HashMap<>());
+        String sqlName = "validSqlName";
+
+        Properties properties = new Properties();
+        properties.setProperty("query", "UPDATE SomeTable SET column = :value");
+        properties.setProperty("inputValidation", "inputValidation");
+        Map<String, Properties> propertiesMap = new HashMap<>();
+        propertiesMap.put("category1", properties);
+
+        Map<String, Map<String, Properties>> resultPropertiesMap = new HashMap<>();
+        resultPropertiesMap.put(sqlName, propertiesMap);
+
+        when(resultProperties.getPropertiesMap()).thenReturn(resultPropertiesMap);
+        when(dao.createOrUpdateDataQuery(any(), any(), any())).thenThrow(new CustomException("Custom exception from DAO"));
+
+        CustomException exception = assertThrows(CustomException.class, () -> {
+            dbConnectorService.createOrUpdateDataQuery(createUpdateRequest, sqlName);
+        });
+        assertEquals("Custom exception from DAO", exception.getMessage());
+    }
+
+    // Add more test cases for different scenarios and requirements
+}
+
