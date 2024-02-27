@@ -29,3 +29,93 @@ public class YourTestClass {
         nativeQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
     }
 }
+=========================================================================================================================
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
+import java.io.IOException;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+public class ErrorCheckerTest {
+
+    private ErrorChecker errorChecker;
+    
+    @Mock
+    private ObjectMapper mockMapper;
+    
+    @Before
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
+        errorChecker = new ErrorChecker();
+    }
+    
+    @Test
+    public void testCheckError_Success() throws IOException {
+        String response = "{\"code\":\"404\",\"details\":\"Not found\",\"moreInfo\":\"http://example.com\"}";
+        
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setCode("404");
+        errorResponse.setDetails("Not found");
+        errorResponse.setMoreInfo("http://example.com");
+        
+        when(mockMapper.readValue(response, ErrorResponse.class)).thenReturn(errorResponse);
+        
+        try {
+            errorChecker.checkError(response, mockMapper);
+        } catch (IOException e) {
+            fail("IOException should not have been thrown");
+        }
+    }
+    
+    @Test
+    public void testCheckError_NullResponse() {
+        try {
+            errorChecker.checkError(null, mockMapper);
+            fail("IOException should have been thrown");
+        } catch (IOException e) {
+            assertEquals("null", e.getMessage());
+        }
+    }
+    
+    @Test
+    public void testCheckError_NullErrorResponse() throws IOException {
+        String response = "{\"code\":\"404\",\"details\":\"Not found\",\"moreInfo\":\"http://example.com\"}";
+        
+        when(mockMapper.readValue(response, ErrorResponse.class)).thenReturn(null);
+        
+        try {
+            errorChecker.checkError(response, mockMapper);
+            fail("IOException should have been thrown");
+        } catch (IOException e) {
+            assertEquals("Not found http://example.com", e.getMessage());
+        }
+    }
+    
+    @Test
+    public void testCheckError_NullErrorMessage() throws IOException {
+        String response = "{\"code\":\"404\",\"details\":null,\"moreInfo\":\"http://example.com\"}";
+        
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setCode("404");
+        errorResponse.setDetails(null);
+        errorResponse.setMoreInfo("http://example.com");
+        
+        when(mockMapper.readValue(response, ErrorResponse.class)).thenReturn(errorResponse);
+        
+        try {
+            errorChecker.checkError(response, mockMapper);
+            fail("IOException should have been thrown");
+        } catch (IOException e) {
+            assertEquals("null http://example.com", e.getMessage());
+        }
+    }
+}
+
+
+
+
