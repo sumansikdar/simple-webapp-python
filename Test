@@ -116,6 +116,97 @@ public class ErrorCheckerTest {
     }
 }
 
+==========================================================================================================================
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestTemplate;
+
+public class APIClientTest {
+
+    private APIClient apiClient;
+    
+    @Mock
+    private RestTemplate mockRestTemplate;
+    
+    @Before
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
+        apiClient = new APIClient();
+        apiClient.setRestTemplate(mockRestTemplate);
+    }
+    
+    @Test
+    public void testCallInternalAPI_ClientErrorException() {
+        String serviceName = "testService";
+        String request = "testRequest";
+        String endPoint = "testEndPoint";
+        HttpMethod method = HttpMethod.GET;
+        Map<String, String> urlMap = Collections.emptyMap();
+        Map<String, String> queryMap = Collections.emptyMap();
+        Map<String, String> headerMap = Collections.emptyMap();
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("header1", "value1");
+        
+        HttpEntity<String> entity = new HttpEntity<>(request, headers);
+        
+        HttpClientErrorException exception = new HttpClientErrorException(org.springframework.http.HttpStatus.BAD_REQUEST, "Client Error");
+        
+        when(mockRestTemplate.exchange(anyString(), eq(method), eq(entity), eq(String.class))).thenThrow(exception);
+        
+        try {
+            apiClient.callInternalAPI(serviceName, request, endPoint, method, urlMap, queryMap, headerMap);
+            fail("RequestProcessingException should have been thrown");
+        } catch (RequestProcessingException e) {
+            assertEquals("Exception in callInternalAPI", e.getMessage());
+            assertEquals("Client Error", e.getCause().getMessage());
+        }
+    }
+    
+    @Test
+    public void testCallInternalAPI_ServerErrorException() {
+        String serviceName = "testService";
+        String request = "testRequest";
+        String endPoint = "testEndPoint";
+        HttpMethod method = HttpMethod.GET;
+        Map<String, String> urlMap = Collections.emptyMap();
+        Map<String, String> queryMap = Collections.emptyMap();
+        Map<String, String> headerMap = Collections.emptyMap();
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("header1", "value1");
+        
+        HttpEntity<String> entity = new HttpEntity<>(request, headers);
+        
+        HttpServerErrorException exception = new HttpServerErrorException(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR, "Server Error");
+        
+        when(mockRestTemplate.exchange(anyString(), eq(method), eq(entity), eq(String.class))).thenThrow(exception);
+        
+        try {
+            apiClient.callInternalAPI(serviceName, request, endPoint, method, urlMap, queryMap, headerMap);
+            fail("RequestProcessingException should have been thrown");
+        } catch (RequestProcessingException e) {
+            assertEquals("Exception in callInternalAPI", e.getMessage());
+            assertEquals("Server Error", e.getCause().getMessage());
+        }
+    }
+}
 
 
 
