@@ -289,3 +289,4 @@ public class YourTestClassTest {
     }
 }
 
+doThrow(new RequestProcessingException(new ErrorResponse())).when(utilMock).errorHandle(anyString(), anyString(), anyString());
