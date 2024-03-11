@@ -150,3 +150,142 @@ public class YourTestClassTest {
 }
 
 
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+import org.junit.Test;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+public class YourTestClassTest {
+
+    @Test
+    public void testCheckFieldInput_Positive() {
+        // Mock Util methods
+        Util utilMock = mock(Util.class);
+        when(utilMock.errorHandle(anyString(), anyString(), anyString())).thenThrow(new RequestProcessingException(new ErrorResponse()));
+
+        // Create a non-empty EligibleFieldRequest
+        EligibleFieldRequest request = new EligibleFieldRequest();
+        request.setAgentRoles(Collections.singletonList("role"));
+        request.setFeatureGroup(Collections.singletonList("group"));
+
+        // Test the method
+        assertTrue(YourTestClass.checkFieldInput(request));
+    }
+
+    @Test
+    public void testCheckFieldInput_Negative() {
+        // Mock Util methods
+        Util utilMock = mock(Util.class);
+        when(utilMock.errorHandle(anyString(), anyString(), anyString())).thenThrow(new RequestProcessingException(new ErrorResponse()));
+
+        // Test with null request
+        assertFalse(YourTestClass.checkFieldInput(null));
+
+        // Test with empty request
+        assertFalse(YourTestClass.checkFieldInput(new EligibleFieldRequest()));
+    }
+
+    @Test
+    public void testCheckLinkInput_Positive() {
+        // Mock Util methods
+        Util utilMock = mock(Util.class);
+        when(utilMock.errorHandle(anyString(), anyString(), anyString())).thenThrow(new RequestProcessingException(new ErrorResponse()));
+
+        // Create a non-empty ExternalLinkRequest
+        ExternalLinkRequest request = new ExternalLinkRequest();
+        request.setAgentRoles(Collections.singletonList("role"));
+        request.setFeatureGroup(Collections.singletonList("group"));
+
+        // Test the method
+        assertTrue(YourTestClass.checkLinkInput(request));
+    }
+
+    @Test
+    public void testCheckLinkInput_Negative() {
+        // Mock Util methods
+        Util utilMock = mock(Util.class);
+        when(utilMock.errorHandle(anyString(), anyString(), anyString())).thenThrow(new RequestProcessingException(new ErrorResponse()));
+
+        // Test with null request
+        assertFalse(YourTestClass.checkLinkInput(null));
+
+        // Test with empty request
+        assertFalse(YourTestClass.checkLinkInput(new ExternalLinkRequest()));
+    }
+
+    @Test
+    public void testValidateHostConnect_Positive() {
+        // Mock Util methods
+        Util utilMock = mock(Util.class);
+        when(utilMock.errorHandle(anyString(), anyString(), anyString())).thenThrow(new RequestProcessingException(new ErrorResponse()));
+
+        // Create a headers map with valid values
+        Map<String, String> headers = new HashMap<>();
+        headers.put("channelId", "SGS");
+        headers.put("hostConnect", "valid");
+
+        // Test the method
+        assertTrue(YourTestClass.validateHostConnect(headers));
+    }
+
+    @Test
+    public void testValidateHostConnect_Negative() {
+        // Mock Util methods
+        Util utilMock = mock(Util.class);
+        when(utilMock.errorHandle(anyString(), anyString(), anyString())).thenThrow(new RequestProcessingException(new ErrorResponse()));
+
+        // Test with null headers
+        assertFalse(YourTestClass.validateHostConnect(null));
+
+        // Test with empty headers
+        assertFalse(YourTestClass.validateHostConnect(Collections.emptyMap()));
+
+        // Test with valid channelId but empty hostConnect
+        Map<String, String> headers = new HashMap<>();
+        headers.put("channelId", "SGS");
+        assertFalse(YourTestClass.validateHostConnect(headers));
+
+        // Test with invalid channelId
+        headers.put("channelId", "Invalid");
+        assertFalse(YourTestClass.validateHostConnect(headers));
+    }
+
+    @Test
+    public void testValidateHeaders_Positive() {
+        // Mock Util methods
+        Util utilMock = mock(Util.class);
+        when(utilMock.errorHandle(anyString(), anyString(), anyString())).thenThrow(new RequestProcessingException(new ErrorResponse()));
+
+        // Create headers with valid values
+        Map<String, String> headers = new HashMap<>();
+        headers.put("channelId", "valid");
+        headers.put("businessCode", "valid");
+        headers.put("countryCode", "valid");
+        headers.put("accessToken", "valid");
+        headers.put("clientId", "valid");
+
+        // Test the method
+        assertTrue(YourTestClass.validateHeaders(headers));
+    }
+
+    @Test
+    public void testValidateHeaders_Negative() {
+        // Mock Util methods
+        Util utilMock = mock(Util.class);
+        when(utilMock.errorHandle(anyString(), anyString(), anyString())).thenThrow(new RequestProcessingException(new ErrorResponse()));
+
+        // Test with null headers
+        assertFalse(YourTestClass.validateHeaders(null));
+
+        // Test with empty channelId
+        Map<String, String> headers = new HashMap<>();
+        headers.put("channelId", "");
+        assertFalse(YourTestClass.validateHeaders(headers));
+
+        // Similarly, write negative tests for empty businessCode, countryCode, accessToken, and clientId
+    }
+}
+
