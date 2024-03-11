@@ -1,220 +1,152 @@
-import org.junit.jupiter.api.Test;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+import org.junit.Test;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class UtilTest {
-
-    // Positive test cases
+public class YourTestClassTest {
 
     @Test
-    public void testGetAccessToken_WithValidAccessToken_ReturnsAccessToken() {
-        Map<String, String> headers = new HashMap<>();
-        headers.put("ACCESS_TOKEN", "validToken123");
-        assertEquals("validToken123", Util.getAccessToken(headers));
+    public void testCheckFieldInput_Positive() {
+        // Mock Util methods
+        Util utilMock = mock(Util.class);
+        when(utilMock.errorHandle(anyInt(), anyString(), anyString())).thenReturn(true);
+
+        // Create a non-empty EligibleFieldRequest
+        EligibleFieldRequest request = new EligibleFieldRequest();
+        request.setAgentRoles(Collections.singletonList("role"));
+        request.setFeatureGroup(Collections.singletonList("group"));
+
+        // Test the method
+        assertTrue(YourTestClass.checkFieldInput(request));
     }
 
     @Test
-    public void testGetClientId_WithValidClientId_ReturnsClientId() {
-        Map<String, String> headers = new HashMap<>();
-        headers.put("CLIENTID", "client123");
-        assertEquals("client123", Util.getClientId(headers));
+    public void testCheckFieldInput_Negative() {
+        // Mock Util methods
+        Util utilMock = mock(Util.class);
+        when(utilMock.errorHandle(anyInt(), anyString(), anyString())).thenReturn(true);
+
+        // Test with null request
+        assertFalse(YourTestClass.checkFieldInput(null));
+
+        // Test with empty request
+        assertFalse(YourTestClass.checkFieldInput(new EligibleFieldRequest()));
     }
 
-    @Test
-    public void testGetCountryCode_WithValidCountryCode_ReturnsCountryCode() {
-        Map<String, String> headers = new HashMap<>();
-        headers.put("COUNTRYCODE", "US");
-        assertEquals("US", Util.getCountryCode(headers));
-    }
-
-    // Negative test cases
-
-    @Test
-    public void testGetAccessToken_WithEmptyHeaders_ReturnsNull() {
-        assertNull(Util.getAccessToken(new HashMap<>()));
-    }
-
-    @Test
-    public void testGetAccessToken_WithMissingAccessToken_ReturnsNull() {
-        Map<String, String> headers = new HashMap<>();
-        headers.put("CLIENTID", "client123");
-        assertNull(Util.getAccessToken(headers));
-    }
-
-    @Test
-    public void testGetClientId_WithEmptyHeaders_ReturnsNull() {
-        assertNull(Util.getClientId(new HashMap<>()));
-    }
-
-    @Test
-    public void testGetClientId_WithMissingClientId_ReturnsNull() {
-        Map<String, String> headers = new HashMap<>();
-        headers.put("ACCESS_TOKEN", "validToken123");
-        assertNull(Util.getClientId(headers));
-    }
-
-    @Test
-    public void testGetCountryCode_WithEmptyHeaders_ReturnsNull() {
-        assertNull(Util.getCountryCode(new HashMap<>()));
-    }
-
-    @Test
-    public void testGetCountryCode_WithMissingCountryCode_ReturnsNull() {
-        Map<String, String> headers = new HashMap<>();
-        headers.put("CLIENTID", "client123");
-        assertNull(Util.getCountryCode(headers));
-    }
+    // Similarly, write test cases for checkLinkInput, validateHostConnect, and validateHeaders methods
 }
 
 
-
-import org.junit.jupiter.api.Test;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+import org.junit.Test;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class UtilTest {
-
-    // Positive test cases for getBusinessCode
+public class YourTestClassTest {
 
     @Test
-    public void testGetBusinessCode_WithValidCode_ReturnsCode() {
+    public void testCheckLinkInput_Positive() {
+        // Mock Util methods
+        Util utilMock = mock(Util.class);
+        when(utilMock.errorHandle(anyInt(), anyString(), anyString())).thenReturn(true);
+
+        // Create a non-empty ExternalLinkRequest
+        ExternalLinkRequest request = new ExternalLinkRequest();
+        request.setAgentRoles(Collections.singletonList("role"));
+        request.setFeatureGroup(Collections.singletonList("group"));
+
+        // Test the method
+        assertTrue(YourTestClass.checkLinkInput(request));
+    }
+
+    @Test
+    public void testCheckLinkInput_Negative() {
+        // Mock Util methods
+        Util utilMock = mock(Util.class);
+        when(utilMock.errorHandle(anyInt(), anyString(), anyString())).thenReturn(true);
+
+        // Test with null request
+        assertFalse(YourTestClass.checkLinkInput(null));
+
+        // Test with empty request
+        assertFalse(YourTestClass.checkLinkInput(new ExternalLinkRequest()));
+    }
+
+    @Test
+    public void testValidateHostConnect_Positive() {
+        // Mock Util methods
+        Util utilMock = mock(Util.class);
+        when(utilMock.errorHandle(anyInt(), anyString(), anyString())).thenReturn(true);
+
+        // Create a headers map with valid values
         Map<String, String> headers = new HashMap<>();
-        headers.put("BUSCODE", "12345");
-        assertEquals("12345", Util.getBusinessCode(headers));
+        headers.put("channelId", "SGS");
+        headers.put("hostConnect", "valid");
+
+        // Test the method
+        assertTrue(YourTestClass.validateHostConnect(headers));
     }
 
     @Test
-    public void testGetBusinessCode_WithEmptyHeaders_ReturnsNull() {
-        assertNull(Util.getBusinessCode(new HashMap<>()));
-    }
+    public void testValidateHostConnect_Negative() {
+        // Mock Util methods
+        Util utilMock = mock(Util.class);
+        when(utilMock.errorHandle(anyInt(), anyString(), anyString())).thenReturn(true);
 
-    @Test
-    public void testGetBusinessCode_WithMissingCode_ReturnsNull() {
+        // Test with null headers
+        assertFalse(YourTestClass.validateHostConnect(null));
+
+        // Test with empty headers
+        assertFalse(YourTestClass.validateHostConnect(Collections.emptyMap()));
+
+        // Test with valid channelId but empty hostConnect
         Map<String, String> headers = new HashMap<>();
-        headers.put("OTHER_KEY", "value");
-        assertNull(Util.getBusinessCode(headers));
-    }
+        headers.put("channelId", "SGS");
+        assertFalse(YourTestClass.validateHostConnect(headers));
 
-    // Positive test cases for getHostConnect and getSid are similar to getBusinessCode
-
-    // Positive test cases for isNullOrEmpty and isNotNullOrEmpty
-
-    @Test
-    public void testIsNullOrEmpty_WithNullOrEmptyString_ReturnsTrue() {
-        assertTrue(Util.isNullOrEmpty(null));
-        assertTrue(Util.isNullOrEmpty(""));
-        assertTrue(Util.isNullOrEmpty(" "));
+        // Test with invalid channelId
+        headers.put("channelId", "Invalid");
+        assertFalse(YourTestClass.validateHostConnect(headers));
     }
 
     @Test
-    public void testIsNullOrEmpty_WithNonEmptyString_ReturnsFalse() {
-        assertFalse(Util.isNullOrEmpty("hello"));
+    public void testValidateHeaders_Positive() {
+        // Mock Util methods
+        Util utilMock = mock(Util.class);
+        when(utilMock.errorHandle(anyInt(), anyString(), anyString())).thenReturn(true);
+
+        // Create headers with valid values
+        Map<String, String> headers = new HashMap<>();
+        headers.put("channelId", "valid");
+        headers.put("businessCode", "valid");
+        headers.put("countryCode", "valid");
+        headers.put("accessToken", "valid");
+        headers.put("clientId", "valid");
+
+        // Test the method
+        assertTrue(YourTestClass.validateHeaders(headers));
     }
 
     @Test
-    public void testIsNotNullOrEmpty_WithNullOrEmptyString_ReturnsFalse() {
-        assertFalse(Util.isNotNullOrEmpty(null));
-        assertFalse(Util.isNotNullOrEmpty(""));
-        assertFalse(Util.isNotNullOrEmpty(" "));
-    }
+    public void testValidateHeaders_Negative() {
+        // Mock Util methods
+        Util utilMock = mock(Util.class);
+        when(utilMock.errorHandle(anyInt(), anyString(), anyString())).thenReturn(true);
 
-    @Test
-    public void testIsNotNullOrEmpty_WithNonEmptyString_ReturnsTrue() {
-        assertTrue(Util.isNotNullOrEmpty("hello"));
-    }
+        // Test with null headers
+        assertFalse(YourTestClass.validateHeaders(null));
 
-    // Positive test cases for generateError
+        // Test with empty channelId
+        Map<String, String> headers = new HashMap<>();
+        headers.put("channelId", "");
+        assertFalse(YourTestClass.validateHeaders(headers));
 
-    @Test
-    public void testGenerateError_WithValidErrorCodeAndDetails_ReturnsErrorResponse() {
-        ErrorResponse error = Util.generateError("404", "Resource not found");
-        assertNotNull(error);
-        assertEquals(HttpStatus.NOT_FOUND, error.getType());
-        assertEquals("404", error.getCode());
-        assertEquals("Resource not found", error.getDetails());
-    }
-
-    // Negative test cases for generateError
-
-    @Test
-    public void testGenerateError_WithNullErrorCode_ReturnsErrorResponseWithNullErrorCode() {
-        ErrorResponse error = Util.generateError(null, "Error details");
-        assertNotNull(error);
-        assertNull(error.getCode());
-        assertEquals("Error details", error.getDetails());
-    }
-
-    @Test
-    public void testGenerateError_WithNullDetails_ReturnsErrorResponseWithNullDetails() {
-        ErrorResponse error = Util.generateError("500", null);
-        assertNotNull(error);
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, error.getType());
-        assertEquals("500", error.getCode());
-        assertNull(error.getDetails());
+        // Similarly, write negative tests for empty businessCode, countryCode, accessToken, and clientId
     }
 }
 
 
-
-
-
-
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-
-public class UtilTest {
-
-    // Positive test cases for generateError
-
-    @Test
-    public void testGenerateError_WithValidExceptionAndErrorCode_ReturnsErrorResponse() {
-        Exception exception = new NullPointerException("Null pointer exception");
-        String errorCode = "500";
-        ErrorResponse error = Util.generateError(exception, errorCode);
-        assertNotNull(error);
-        assertEquals("500", error.getCode());
-        assertEquals("Internal Server Error", error.getType().toString());
-        assertEquals("Null pointer exception", error.getDetails());
-        assertEquals("Null pointer exception", error.getMoreInfo());
-    }
-
-    @Test
-    public void testGenerateError_WithValidExceptionContainingRecordNotFound_ReturnsErrorResponseWithMoreInfo() {
-        Exception exception = new RuntimeException("RECORD NOT FOUND: User with ID 123 not found");
-        String errorCode = "404";
-        ErrorResponse error = Util.generateError(exception, errorCode);
-        assertNotNull(error);
-        assertEquals("404", error.getCode());
-        assertEquals("Not Found", error.getType().toString());
-        assertEquals("RECORD NOT FOUND: User with ID 123 not found", error.getDetails());
-        assertEquals("RECORD NOT FOUND: User with ID 123 not found", error.getMoreInfo());
-    }
-
-    // Negative test cases for generateError
-
-    @Test
-    public void testGenerateError_WithNullException_ReturnsErrorResponseWithNullDetails() {
-        String errorCode = "500";
-        ErrorResponse error = Util.generateError(null, errorCode);
-        assertNotNull(error);
-        assertEquals("500", error.getCode());
-        assertEquals("Internal Server Error", error.getType().toString());
-        assertNull(error.getDetails());
-        assertNull(error.getMoreInfo());
-    }
-
-    // Positive test cases for errorHandle
-
-    @Test
-    public void testErrorHandle_WithValidErrorCodeAndMethodName_ThrowsRequestProcessingException() {
-        assertThrows(RequestProcessingException.class, () -> {
-            Util.errorHandle("404", "getUser", "User not found");
-        });
-    }
-
-    // Negative test cases for errorHandle
-    // Unable to provide negative test cases as it throws an exception directly without returning anything.
-}
