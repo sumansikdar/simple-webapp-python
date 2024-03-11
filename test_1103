@@ -1,0 +1,101 @@
+import org.junit.jupiter.api.Test;
+import java.util.HashMap;
+import java.util.Map;
+import static org.junit.jupiter.api.Assertions.*;
+
+public class UtilTest {
+
+    @Test
+    public void testGetUUid_WithValidUUID_ReturnsUUID() {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("UUID", "123456789");
+        assertEquals("123456789", Util.getUUid(headers));
+    }
+
+    @Test
+    public void testGetUUid_WithEmptyHeaders_ReturnsNull() {
+        assertNull(Util.getUUid(new HashMap<>()));
+    }
+
+    @Test
+    public void testGetUUid_WithMissingUUID_ReturnsNull() {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("CHANNELID", "channel123");
+        assertNull(Util.getUUid(headers));
+    }
+
+    @Test
+    public void testGetChannelId_WithValidChannelId_ReturnsChannelId() {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("CHANNELID", "channel123");
+        assertEquals("channel123", Util.getChannelId(headers));
+    }
+
+    @Test
+    public void testGetChannelId_WithEmptyHeaders_ReturnsNull() {
+        assertNull(Util.getChannelId(new HashMap<>()));
+    }
+
+    @Test
+    public void testGetChannelId_WithMissingChannelId_ReturnsNull() {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("UUID", "123456789");
+        assertNull(Util.getChannelId(headers));
+    }
+
+    // Similar tests for other methods (getAccessToken, getClientId, getCountryCode) would follow the same pattern.
+}
+
+
+
+
+
+
+import org.junit.jupiter.api.Test;
+import java.util.HashMap;
+import java.util.Map;
+import static org.junit.jupiter.api.Assertions.*;
+
+public class UtilTest {
+
+    // Positive test cases omitted for brevity
+
+    @Test
+    public void testGetUUid_WithNullHeaders_ReturnsNull() {
+        assertNull(Util.getUUid(null));
+    }
+
+    @Test
+    public void testGetUUid_WithNullValueForUUID_ReturnsNull() {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("UUID", null);
+        assertNull(Util.getUUid(headers));
+    }
+
+    @Test
+    public void testGetUUid_WithEmptyValueForUUID_ReturnsNull() {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("UUID", "");
+        assertNull(Util.getUUid(headers));
+    }
+
+    @Test
+    public void testGetChannelId_WithNullHeaders_ReturnsNull() {
+        assertNull(Util.getChannelId(null));
+    }
+
+    @Test
+    public void testGetAccessToken_WithNullHeaders_ReturnsNull() {
+        assertNull(Util.getAccessToken(null));
+    }
+
+    @Test
+    public void testGetClientId_WithNullHeaders_ReturnsNull() {
+        assertNull(Util.getClientId(null));
+    }
+
+    @Test
+    public void testGetCountryCode_WithNullHeaders_ReturnsNull() {
+        assertNull(Util.getCountryCode(null));
+    }
+}
