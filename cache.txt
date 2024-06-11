@@ -139,3 +139,18 @@ Key code snippets and their explanations.
 Demo:
 
 Live demonstration of the caching mechanism.
+
+================================================================================
+1
+Need for efficient caching of REST API responses.
+Performance issues with frequent API calls.
+Reducing load on external services.
+Ensuring data freshness with TTL.
+
+2
+Use MongoDB for caching.
+Cache API responses with dynamic collection names.
+Implement TTL and eviction strategies.
+Generate unique keys for cache entries.
+
+3
