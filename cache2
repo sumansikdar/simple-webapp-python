@@ -1,0 +1,32 @@
+Agenda
+Introduction
+Problem Statement
+Proposed Solution
+Design Overview
+Class Diagram
+Sequence Diagram
+Implementation Details
+Handling Different Cache Types
+Key Generation Strategy
+Cache Eviction Strategy
+Demo Plan
+Live Demonstration
+Future Work and Improvements
+Q&A Session
+Conclusion
+
+Define the Problem: Every call to an external microservice can be time-consuming and resource-intensive.
+Explain the Need for Caching:
+Reduce the number of calls to external services.
+Improve response time for users.
+Decrease load on the external services.
+Benefits of Caching:
+Improved performance.
+Reduced latency.
+Cost savings by reducing the number of API calls.
+
+  Goals:
+Efficiently cache API responses.
+Use dynamic collection names.
+Implement TTL (Time To Live) for cache invalidation.
+Provide mechanisms for cache eviction.
