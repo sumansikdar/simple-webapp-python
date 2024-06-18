@@ -1,156 +1,116 @@
-I can understand. But my expectation is - we have a service(implemented in spring boot), that will call/consume another microservice and get the expected response in the JSON format. 
-we have MONGO DB as a caching medium. Now tell me how to implement the caching layer here, Which should be able to cache the rest API response from microservices call in a 
-best possible way/design so that we don't need to call the other services every time. We should have TTL defined, so that the MONGO DB as a cache can be updated accordingly. 
-Here MONGO DB cache can store data into the mongo collections and documents for better implementation. Explain it with proper code implementation and project structure.
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+public class HashUtil {
+
+    public static String sha256(String base) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(base.getBytes(StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder(2 * hash.length);
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
 
 
-This setup provides a simple and effective caching layer using MongoDB to store REST API responses. The TTL logic ensures that stale data is not served, and fresh data is fetched 
-from the external microservice when needed.
 
 
-Thank you for the explanation. Here you have define the invalidation using TTL logic. But how the eviction logic will be implemented. and what all will be the condition check / 
-parameter check to call that eviction algorithm. Please implement the eviction function / method also.
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Map;
 
-Collection Indexes
-To optimize the performance, especially for eviction queries, create an index on the createdAt field:
+public class CacheKeyGenerator {
 
-db.cache.createIndex({ "createdAt": 1 })
+    public static String generateKey(String baseUrl, String id, Map<String, String> queryParams, String requestBody, String method) {
+        StringBuilder keyBuilder = new StringBuilder(baseUrl)
+            .append(id != null ? id : "");
 
+        if (queryParams != null && !queryParams.isEmpty()) {
+            queryParams.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .forEach(entry -> keyBuilder.append(entry.getKey()).append(entry.getValue()));
+        }
 
-cacheResponse(String id, String response) - Here the 'id' is the key to save the corresponding api response to the mongodb collection and same will be used to fetch the data from the db 
-using getCachedResponse(id). What is the best way to implement the id here? please explain with code details
+        if ("POST".equalsIgnoreCase(method) && requestBody != null) {
+            keyBuilder.append(requestBody);
+        }
 
-String cacheKey = HashUtil.sha256(id); - here what should be the id? It should be unique for each rest api call response. How to define it in the best way  possible ?
+        return keyBuilder.toString();
+    }
 
-evictExpiredEntries() - if the TTL is a variable and will be supplied for each api cache. Then how can we implement the function more efficiently?
-
-For generateKey() method if the api request is of type Post. Then how to handle it? 
-
-For multiple collections let's say apiCache and dbCache, how the CacheDocument pojo classes will be implemented? And how to invoke them in CacheService class
-
-===============================================================================
-
-Sure, here's a suggested order for the spike story presentation:
-
-Title Slide
-
-Title: "Implementing Caching for REST API Responses using MongoDB"
-Your name and date
-Agenda
-
-Overview of the presentation topics
-Problem Statement
-
-Define the problem
-Explain why caching is needed
-Benefits of caching (performance improvement, reduced load on external services, etc.)
-Proposed Solution
-
-High-level description of the solution
-Goals of the implementation
-Design Overview
-
-Architecture diagram (if applicable)
-Explanation of the overall architecture
-Class Diagram
-
-Display the UML class diagram
-Explain the relationships between the classes
-Sequence Diagram
-
-Display the sequence diagram
-Describe the flow of a typical request, highlighting caching operations
-Implementation Details
-
-CacheDocument interface
-ApiCacheDocument and DbCacheDocument classes
-Generic CacheRepository
-CacheService class
-Explanation of key methods (getCachedResponse, cacheResponse, evictExpiredEntries)
-Handling Different Cache Types
-
-Explanation of how the design handles multiple cache types
-ApiCacheRepository and DbCacheRepository
-Key Generation Strategy
-
-Discuss the generateKey() method
-Explain how to handle different HTTP methods (GET, POST)
-Cache Eviction Strategy
-
-Explain the eviction strategy
-How TTL is managed and how expired entries are evicted
-Demo Plan
-
-Outline the steps for the demo
-What will be shown (e.g., API call without cache, API call with cache, cache expiry, cache eviction)
-Live Demonstration
-
-Perform the live demo following the steps outlined
-Future Work and Improvements
-
-Potential improvements or future enhancements (e.g., more sophisticated eviction policies, support for other types of caches)
-Q&A Session
-
-Open the floor for questions and discussions
-Conclusion
-
-Summarize the key points
-Reinforce the benefits of the implemented solution
-By following this order, you'll be able to present a structured and coherent overview of your spike story, from problem definition through to implementation and demonstration.
+    public static String sha256(String rawKey) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] encodedHash = digest.digest(rawKey.getBytes(StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : encodedHash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("No such algorithm exception", e);
+        }
+    }
+}
 
 
-=================================================================================================
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
-1. Problem Statement
-Start by clearly defining the problem that needs to be solved.
+public class HashGenerator {
 
-Example:
+    public static String generateHashKey(String url, String requestBody) {
+        // Concatenate URL and request body
+        String input = url + requestBody;
 
-Title: Implement Caching for REST API Responses using MongoDB
-Objective: To reduce the number of calls to an external microservice by caching responses in MongoDB, ensuring efficient retrieval and management with TTL (Time-to-Live) and eviction mechanisms.
-2. Proposed Solution
-Outline the proposed solution, explaining how it addresses the problem.
+        // Generate SHA-256 hash
+        return hashWithSHA256(input);
+    }
 
-Example:
+    private static String hashWithSHA256(String input) {
+        try {
+            // Get a SHA-256 MessageDigest instance
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            
+            // Perform the hash computation
+            byte[] hashBytes = digest.digest(input.getBytes(StandardCharsets.UTF_8));
 
-Solution: Implement a caching mechanism that stores API responses in MongoDB. Use TTL to invalidate cache entries and ensure fresh data retrieval. Implement separate caches for different types of data (API and DB responses) using a common interface and generic services.
-3. Design Overview
-Provide an overview of the design, including class diagrams and sequence diagrams.
+            // Convert the byte array to a hex string
+            StringBuilder hexString = new StringBuilder(2 * hashBytes.length);
+            for (byte b : hashBytes) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
 
-6. Presentation
-Prepare slides to present the spike story:
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Error generating hash key", e);
+        }
+    }
 
-Title Slide:
+    public static void main(String[] args) {
+        String url = "https://api.example.com/endpoint";
+        String requestBody = "{\"key\":\"value\"}";
 
-Title: "Implementing Caching for REST API Responses using MongoDB"
-Problem Statement:
-
-Outline the need for caching and the benefits it brings.
-Proposed Solution:
-
-High-level overview of the solution.
-Design Overview:
-
-Class and sequence diagrams.
-Explanation of the design choices.
-Implementation Details:
-
-Key code snippets and their explanations.
-Demo:
-
-Live demonstration of the caching mechanism.
-
-================================================================================
-1
-Need for efficient caching of REST API responses.
-Performance issues with frequent API calls.
-Reducing load on external services.
-Ensuring data freshness with TTL.
-
-2
-Use MongoDB for caching.
-Cache API responses with dynamic collection names.
-Implement TTL and eviction strategies.
-Generate unique keys for cache entries.
-
-3
+        String hashKey = generateHashKey(url, requestBody);
+        System.out.println("Generated Hash Key: " + hashKey);
+    }
+}
