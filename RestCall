@@ -1,0 +1,57 @@
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.http.ssl.TrustStrategy;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.web.client.RestTemplate;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import java.io.FileInputStream;
+import java.security.KeyStore;
+import java.security.cert.X509Certificate;
+
+@Configuration
+public class RestClientConfiguration {
+
+    // Path to your .pfx or .p12 file
+    private static final String KEYSTORE_PATH = "/path/to/your/client-cert.pfx";
+    private static final String KEYSTORE_PASSWORD = "your_keystore_password";
+
+    @Bean
+    public RestTemplate restTemplate() throws Exception {
+        char[] password = KEYSTORE_PASSWORD.toCharArray();
+
+        KeyStore keyStore = KeyStore.getInstance("PKCS12");
+        keyStore.load(new FileInputStream(KEYSTORE_PATH), password);
+
+        SSLContext sslContext = SSLContextBuilder.create()
+                .loadKeyMaterial(keyStore, password)
+                .loadTrustMaterial(new TrustStrategy() {
+                    @Override
+                    public boolean isTrusted(X509Certificate[] chain, String authType) {
+                        // Trust all certificates
+                        return true;
+                    }
+                })
+                .build();
+
+        HttpClient httpClient = HttpClients.custom()
+                .setSSLContext(sslContext)
+                .setSSLHostnameVerifier(new HostnameVerifier() {
+                    @Override
+                    public boolean verify(String s, SSLSession sslSession) {
+                        // Allow all hostnames
+                        return true;
+                    }
+                })
+                .build();
+
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(httpClient);
+
+        return new RestTemplate(factory);
+    }
+}
