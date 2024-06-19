@@ -105,3 +105,10 @@ public class RestTemplateConfig {
 }
 
 
+    // Create HttpClient with SSL context
+    CloseableHttpClient httpClient = HttpClients.custom()
+            .setSSLContext(sslContext)
+            .setSSLHostnameVerifier((hostname, session) -> true)
+            .build();
+
+
