@@ -1,32 +1,62 @@
-Agenda
-Introduction
-Problem Statement
-Proposed Solution
-Design Overview
-Class Diagram
-Sequence Diagram
-Implementation Details
-Handling Different Cache Types
-Key Generation Strategy
-Cache Eviction Strategy
-Demo Plan
-Live Demonstration
-Future Work and Improvements
-Q&A Session
-Conclusion
+import java.io.FileInputStream;
+import java.security.KeyStore;
+import org.springframework.core.io.ClassPathResource;
 
-Define the Problem: Every call to an external microservice can be time-consuming and resource-intensive.
-Explain the Need for Caching:
-Reduce the number of calls to external services.
-Improve response time for users.
-Decrease load on the external services.
-Benefits of Caching:
-Improved performance.
-Reduced latency.
-Cost savings by reducing the number of API calls.
+public KeyStore loadKeyStore(String filePath, String passphrase) throws Exception {
+    KeyStore keyStore = KeyStore.getInstance("PKCS12");
+    try (FileInputStream inputStream = new FileInputStream(filePath)) {
+        keyStore.load(inputStream, passphrase.toCharArray());
+    }
+    return keyStore;
+}
 
-  Goals:
-Efficiently cache API responses.
-Use dynamic collection names.
-Implement TTL (Time To Live) for cache invalidation.
-Provide mechanisms for cache eviction.
+import javax.net.ssl.SSLContext;
+import org.springframework.util.ResourceUtils;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContexts;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.web.client.RestTemplate;
+
+public SSLContext createSSLContext(KeyStore keyStore, String passphrase) throws Exception {
+    return SSLContexts.custom()
+            .loadKeyMaterial(keyStore, passphrase.toCharArray())
+            .build();
+}
+
+public RestTemplate createRestTemplate(String pfxFilePath, String passphrase) throws Exception {
+    KeyStore keyStore = loadKeyStore(pfxFilePath, passphrase);
+    SSLContext sslContext = createSSLContext(keyStore, passphrase);
+
+    SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext);
+    CloseableHttpClient httpClient = HttpClients.custom()
+            .setSSLSocketFactory(socketFactory)
+            .build();
+
+    HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(httpClient);
+
+    return new RestTemplate(factory);
+}
+
+public class RestTemplateWithClientCertExample {
+
+    public static void main(String[] args) {
+        try {
+            String pfxFilePath = "path/to/your/certificate.pfx";
+            String passphrase = "your_passphrase";
+
+            RestTemplate restTemplate = createRestTemplate(pfxFilePath, passphrase);
+
+            String url = "https://your-secure-url.com/api";
+            String response = restTemplate.getForObject(url, String.class);
+
+            System.out.println("Response: " + response);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Include methods loadKeyStore, createSSLContext, and createRestTemplate here
+}
+
