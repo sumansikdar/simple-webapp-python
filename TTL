@@ -1,0 +1,45 @@
+MongoDB has a built-in mechanism to handle TTL (Time-to-Live) indexes that can automatically delete documents once they expire. 
+You can define a TTL index on a field in your MongoDB collection, and MongoDB will automatically remove documents when their TTL expires. 
+This means you don't need to write custom code to delete the entries after expiration.
+
+Here's how you can set up a TTL index in MongoDB:
+
+Create a TTL Index:
+You need to create a TTL index on a date field that indicates the expiration time. MongoDB will use this index to automatically delete documents when the specified duration has passed.
+
+Define the Expiration Field in Your Document:
+Ensure your documents have a date field that indicates when the document should expire.
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.time.LocalDateTime;
+
+@Document(collection = "apiCache")
+public class CacheDocument {
+    @Id
+    private String id;
+    private String response;
+    private LocalDateTime createdAt;
+
+    @Indexed(expireAfterSeconds = 0)
+    private LocalDateTime expireAt;
+
+    // getters and setters
+}
+
+In this example, expireAt is the field that will be used for the TTL index. 
+The expireAfterSeconds attribute in the @Indexed annotation specifies that MongoDB should remove the document when this field is reached.
+
+
+Creating a TTL Index with MongoDB Shell
+If you're using the MongoDB shell, you can create a TTL index as follows:
+
+db.apiCache.createIndex({ "expireAt": 1 }, { expireAfterSeconds: 0 })
+
+In this command:
+
+apiCache is the collection name.
+"expireAt": 1 specifies the field expireAt and the sort order.
+{ expireAfterSeconds: 0 } tells MongoDB to remove documents once the expireAt field time is reached.
