@@ -43,3 +43,17 @@ In this command:
 apiCache is the collection name.
 "expireAt": 1 specifies the field expireAt and the sort order.
 { expireAfterSeconds: 0 } tells MongoDB to remove documents once the expireAt field time is reached.
+
+
+public void cacheResponse(String key, String response, long ttl, String collectionName) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime expireAt = now.plusSeconds(ttl);
+
+        CacheDocument cacheDocument = new CacheDocument();
+        cacheDocument.setId(key);
+        cacheDocument.setResponse(response);
+        cacheDocument.setCreatedAt(now);
+        cacheDocument.setExpireAt(expireAt);
+
+        mongoTemplate.save(cacheDocument, collectionName);
+    }
