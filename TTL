@@ -62,12 +62,13 @@ public void cacheResponse(String key, String response, long ttl, String collecti
 
 
 
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
-import com.mongodb.MongoClientOptions;
 
 @Configuration
 public class MongoConfig {
@@ -77,14 +78,12 @@ public class MongoConfig {
 
     @Bean
     public MongoClient mongoClient() {
-        System.setProperty("javax.net.ssl.trustStore", "/dev/null");
+        ConnectionString connectionString = new ConnectionString(mongoUri);
+        MongoClientSettings settings = MongoClientSettings.builder()
+            .applyConnectionString(connectionString)
+            .applyToSslSettings(builder -> builder.invalidHostNameAllowed(true))
+            .build();
         
-        MongoClientOptions options = MongoClientOptions.builder()
-                .sslInvalidHostNameAllowed(true)
-                .build();
-
-        MongoClientURI uri = new MongoClientURI(mongoUri, MongoClientOptions.builder(options));
-        
-        return new MongoClient(uri);
+        return MongoClients.create(settings);
     }
 }
