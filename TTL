@@ -57,3 +57,34 @@ public void cacheResponse(String key, String response, long ttl, String collecti
 
         mongoTemplate.save(cacheDocument, collectionName);
     }
+
+
+
+
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import com.mongodb.MongoClientOptions;
+
+@Configuration
+public class MongoConfig {
+
+    @Value("${spring.data.mongodb.uri}")
+    private String mongoUri;
+
+    @Bean
+    public MongoClient mongoClient() {
+        System.setProperty("javax.net.ssl.trustStore", "/dev/null");
+        
+        MongoClientOptions options = MongoClientOptions.builder()
+                .sslInvalidHostNameAllowed(true)
+                .build();
+
+        MongoClientURI uri = new MongoClientURI(mongoUri, MongoClientOptions.builder(options));
+        
+        return new MongoClient(uri);
+    }
+}
