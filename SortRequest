@@ -1,0 +1,134 @@
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class SortJSONByKeyAndValues {
+    public static void main(String[] args) {
+        // Example JSON string
+        String jsonString = """
+                {
+                    "c": ["value3", "value1", "value2"],
+                    "a": ["value2", "value1"],
+                    "b": ["value3", "value1", "value2"]
+                }
+                """;
+
+        // Parse the JSON string into a JSONObject
+        var jsonObject = new JSONObject(jsonString);
+
+        // Create a sorted map using streams
+        var sortedMap = jsonObject.toMap().entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> {
+                            Object value = entry.getValue();
+                            if (value instanceof List) {
+                                // Sort the list
+                                List<?> sortedList = ((List<?>) value).stream()
+                                        .sorted()
+                                        .collect(Collectors.toList());
+                                return sortedList;
+                            }
+                            return value;
+                        },
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new
+                ));
+
+        // Convert the sorted map back to a JSONObject
+        var sortedJsonObject = new JSONObject(sortedMap);
+
+        // Print the sorted JSONObject
+        System.out.println(sortedJsonObject.toString());
+    }
+}
+
+
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class SortJSONByKeyAndValuesRecursive {
+    public static void main(String[] args) {
+        // Example JSON string
+        String jsonString = """
+                {
+                    "c": ["value3", {"innerKey3": ["innerValue3", "innerValue1", "innerValue2"], "innerKey1": "innerValue"}, "value2"],
+                    "a": ["value2", {"innerKey2": "innerValue1", "innerKey1": "innerValue2"}, "value1"],
+                    "b": ["value3", "value1", "value2"]
+                }
+                """;
+
+        // Parse the JSON string into a JSONObject
+        var jsonObject = new JSONObject(jsonString);
+
+        // Sort the JSON object recursively
+        var sortedJsonObject = sortJSONObject(jsonObject);
+
+        // Print the sorted JSONObject
+        System.out.println(sortedJsonObject.toString(2)); // Pretty print with an indentation of 2 spaces
+    }
+
+    private static Object sortJSONObject(Object obj) {
+        if (obj instanceof JSONObject jsonObject) {
+            var sortedMap = jsonObject.toMap().entrySet().stream()
+                    .sorted(Map.Entry.comparingByKey())
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            entry -> sortJSONObject(entry.getValue()), // Recursive call
+                            (e1, e2) -> e1,
+                            LinkedHashMap::new
+                    ));
+            return new JSONObject(sortedMap);
+        } else if (obj instanceof JSONArray jsonArray) {
+            var sortedList = jsonArray.toList().stream()
+                    .map(SortJSONByKeyAndValuesRecursive::sortJSONObject) // Recursive call
+                    .sorted(Comparator.comparing(Object::toString))
+                    .collect(Collectors.toList());
+            return new JSONArray(sortedList);
+        } else if (obj instanceof List) {
+            var sortedList = ((List<?>) obj).stream()
+                    .map(SortJSONByKeyAndValuesRecursive::sortJSONObject) // Recursive call
+                    .sorted(Comparator.comparing(Object::toString))
+                    .collect(Collectors.toList());
+            return sortedList;
+        }
+        return obj; // Return the value as is if it's not a JSONObject, JSONArray, or List
+    }
+}
+
+
+
+{
+  "a": [
+    "value1",
+    "value2",
+    {
+      "innerKey1": "innerValue2",
+      "innerKey2": "innerValue1"
+    }
+  ],
+  "b": [
+    "value1",
+    "value2",
+    "value3"
+  ],
+  "c": [
+    "value2",
+    "value3",
+    {
+      "innerKey1": "innerValue",
+      "innerKey3": [
+        "innerValue1",
+        "innerValue2",
+        "innerValue3"
+      ]
+    }
+  ]
+}
