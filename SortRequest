@@ -104,6 +104,55 @@ public class SortJSONByKeyAndValuesRecursive {
 }
 
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class SortMapByKeyAndValuesRecursive {
+    public static void main(String[] args) {
+        // Example input map
+        Map<String, Object> inputMap = new HashMap<>();
+        inputMap.put("c", List.of("value3", Map.of("innerKey3", List.of("innerValue3", "innerValue1", "innerValue2"), "innerKey1", "innerValue"), "value2"));
+        inputMap.put("a", List.of("value2", Map.of("innerKey2", "innerValue1", "innerKey1", "innerValue2"), "value1"));
+        inputMap.put("b", List.of("value3", "value1", "value2"));
+
+        // Sort the input map recursively
+        Map<String, Object> sortedMap = sortMapByKeyAndValues(inputMap);
+
+        // Convert the sorted map to a JSONObject for pretty printing
+        JSONObject sortedJsonObject = new JSONObject(sortedMap);
+        System.out.println(sortedJsonObject.toString(2)); // Pretty print with an indentation of 2 spaces
+    }
+
+    private static Map<String, Object> sortMapByKeyAndValues(Map<String, Object> map) {
+        return map.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> sortObject(entry.getValue()), // Recursive call
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new
+                ));
+    }
+
+    private static Object sortObject(Object obj) {
+        if (obj instanceof Map<?, ?> map) {
+            //noinspection unchecked
+            return sortMapByKeyAndValues((Map<String, Object>) map); // Recursive call
+        } else if (obj instanceof List<?> list) {
+            return list.stream()
+                    .map(SortMapByKeyAndValuesRecursive::sortObject) // Recursive call
+                    .sorted(Comparator.comparing(Object::toString))
+                    .collect(Collectors.toList());
+        }
+        return obj; // Return the value as is if it's not a Map or List
+    }
+}
+
+
+
 
 {
   "a": [
