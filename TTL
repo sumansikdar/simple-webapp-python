@@ -57,10 +57,13 @@ public void cacheResponse(String key, String response, long ttl, String collecti
 
         mongoTemplate.save(cacheDocument, collectionName);
     }
+=========================================================
+const url = "https://example.com/abc123/websocket/value1/value2";
+const match = url.match(/\/([^\/]+)\/websocket/);
+const value = match ? match[1] : null;
+console.log(value); // Output: "abc123"
 
-
-
-
+===============================================================
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
