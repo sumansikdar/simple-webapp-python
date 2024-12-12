@@ -1,0 +1,239 @@
+public class PrimaryDept {
+    private String variant;
+    private String deptName;
+    private String deptId;
+
+    // Getters and Setters
+    public String getVariant() {
+        return variant;
+    }
+
+    public void setVariant(String variant) {
+        this.variant = variant;
+    }
+
+    public String getDeptName() {
+        return deptName;
+    }
+
+    public void setDeptName(String deptName) {
+        this.deptName = deptName;
+    }
+
+    public String getDeptId() {
+        return deptId;
+    }
+
+    public void setDeptId(String deptId) {
+        this.deptId = deptId;
+    }
+}
+
+
+public class Role {
+    private String name;
+    private String id;
+
+    // Getters and Setters
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+}
+
+
+import java.util.List;
+
+public class Dle {
+    private List<PrimaryDept> primaryDept;
+
+    // Getters and Setters
+    public List<PrimaryDept> getPrimaryDept() {
+        return primaryDept;
+    }
+
+    public void setPrimaryDept(List<PrimaryDept> primaryDept) {
+        this.primaryDept = primaryDept;
+    }
+}
+
+
+import java.util.List;
+
+public class Response {
+    private Role role;
+    private List<Dle> dle;
+
+    // Getters and Setters
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public List<Dle> getDle() {
+        return dle;
+    }
+
+    public void setDle(List<Dle> dle) {
+        this.dle = dle;
+    }
+}
+
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        String json = "[{\"role\": {\"name\": \"fin_service\", \"id\": \"fin_id\"}, \"dle\": [{\"primary_dept\": [{\"variant\": \"\", \"dept_name\": \"CSSU\", \"dept_id\": \"CHD2CSSU\"}]}]}]";
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        
+        // Deserialize JSON array into a list of Response objects
+        List<Response> responseList = objectMapper.readValue(json, objectMapper.getTypeFactory().constructCollectionType(List.class, Response.class));
+
+        // Access role.name
+        String roleName = responseList.get(0).getRole().getName();
+        System.out.println("Role Name: " + roleName);
+    }
+}
+
+
+=========================================================================================
+
+public class AttributeValue {
+    private boolean isRange;
+    private boolean isList;
+    private String valueType;
+    private String value;
+
+    // Getters and Setters
+    public boolean isRange() {
+        return isRange;
+    }
+
+    public void setRange(boolean isRange) {
+        this.isRange = isRange;
+    }
+
+    public boolean isList() {
+        return isList;
+    }
+
+    public void setList(boolean isList) {
+        this.isList = isList;
+    }
+
+    public String getValueType() {
+        return valueType;
+    }
+
+    public void setValueType(String valueType) {
+        this.valueType = valueType;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+}
+
+
+public class Attribute {
+    private String id;
+    private AttributeValue value;
+
+    // Getters and Setters
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public AttributeValue getValue() {
+        return value;
+    }
+
+    public void setValue(AttributeValue value) {
+        this.value = value;
+    }
+}
+
+
+import java.util.List;
+
+public class AttributeListResponse {
+    private List<Attribute> attributeList;
+
+    // Getters and Setters
+    public List<Attribute> getAttributeList() {
+        return attributeList;
+    }
+
+    public void setAttributeList(List<Attribute> attributeList) {
+        this.attributeList = attributeList;
+    }
+}
+
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        String json = "{\n" +
+                "  \"attributeList\": [\n" +
+                "    {\n" +
+                "      \"id\": \"override\",\n" +
+                "      \"value\": {\n" +
+                "        \"isRange\": false,\n" +
+                "        \"isList\": false,\n" +
+                "        \"valueType\": \"3\",\n" +
+                "        \"value\": \"true\"\n" +
+                "      }\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"id\": \"email\",\n" +
+                "      \"value\": {\n" +
+                "        \"isRange\": false,\n" +
+                "        \"isList\": false,\n" +
+                "        \"valueType\": \"4\",\n" +
+                "        \"value\": \"suman.sikdar@citi.com\"\n" +
+                "      }\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+
+        // Initialize ObjectMapper
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // Deserialize JSON into AttributeListResponse
+        AttributeListResponse response = objectMapper.readValue(json, AttributeListResponse.class);
+
+        // Access parsed data
+        for (Attribute attribute : response.getAttributeList()) {
+            System.out.println("ID: " + attribute.getId());
+            System.out.println("Value Type: " + attribute.getValue().getValueType());
+            System.out.println("Value: " + attribute.getValue().getValue());
+            System.out.println("-----------");
+        }
+    }
+}
