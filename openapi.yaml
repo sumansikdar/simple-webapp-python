@@ -1,0 +1,128 @@
+openapi: 3.0.1
+info:
+  title: EEMS API
+  version: 1.0.0
+  description: This API handles requests related to provisioning and fetching attribute values for entities like "primaryRole."
+
+paths:
+  /eemsRestProvisionDictionary:
+    post:
+      summary: Provision dictionary for a given entity
+      description: This endpoint provisions the dictionary for the specified entity.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                requestId:
+                  type: string
+                  example: "202"
+                requestBy:
+                  type: string
+                  example: "ss50431"
+                entity:
+                  type: string
+                  example: "primaryRole"
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId:
+                    type: string
+                    example: "ss50431"
+                  attributes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          example: "roleId"
+                        id:
+                          type: string
+                          example: "202"
+                        type:
+                          type: string
+                          example: "number"
+                  entity:
+                    type: string
+                    example: "primaryRole"
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+
+  /fetchAttributesAndValues:
+    post:
+      summary: Fetch attributes and their values for a given entity
+      description: This endpoint retrieves attributes and their values based on matching criteria.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                requestId:
+                  type: string
+                  example: "303"
+                match:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                        example: "roleId"
+                      value:
+                        type: string
+                        example: "SERVICEBRANDS"
+                retrieve:
+                  type: array
+                  items:
+                    type: string
+                    example: "roleId"
+                requestBy:
+                  type: string
+                  example: "ss50431"
+                entity:
+                  type: string
+                  example: "primaryRole"
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId:
+                    type: string
+                    example: "ss50431"
+                  attributes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          example: "roleId"
+                        id:
+                          type: string
+                          example: "202"
+                        type:
+                          type: string
+                          example: "number"
+                  entity:
+                    type: string
+                    example: "primaryRole"
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
