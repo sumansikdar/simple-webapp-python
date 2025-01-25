@@ -104,24 +104,28 @@ paths:
                 properties:
                   requestId:
                     type: string
-                    example: "ss50431"
+                    example: "303"
                   attributes:
                     type: array
                     items:
-                      type: object
-                      properties:
-                        name:
-                          type: string
-                          example: "roleId"
-                        id:
-                          type: string
-                          example: "202"
-                        type:
-                          type: string
-                          example: "number"
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: "roleId"
+                          value:
+                            type: string
+                            example: "2"
                   entity:
                     type: string
                     example: "primaryRole"
+                  parentIds:
+                    type: array
+                    items:
+                      type: string
+                      example: "string"
         '404':
           description: Resource not found
         '500':
