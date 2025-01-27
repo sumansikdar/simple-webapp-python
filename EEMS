@@ -1,0 +1,23 @@
+Subject: Request for Guidance on Web Service Support for EEMS
+
+Hi Saji,
+
+I hope this email finds you well.
+
+I am reaching out regarding web service support for EEMS. Currently, we are making localhost REST API calls for two endpoints: the webhook URL and the dictionary URL.
+
+We need to implement this as an OSE-deployed cloud service that will expose two REST APIs as mentioned above. While we will handle all the business logic internally, our service API calls require passing the access token and SID as header request parameters to execute and receive a valid response.
+
+We connected with the offshore EEMS team (REQ: [please add request ID]) to explore implementation options. However, we learned that passing headers is not currently supported.
+
+I would appreciate your guidance on:
+
+a) Potential alternative approaches to implement this requirement.
+b) Contact information for any teams who have previously implemented similar webservice-enabled features.
+
+If you have any questions or need additional information, feel free to reach out.
+
+Thank you for your time and support!
+
+Best regards,
+Suman
