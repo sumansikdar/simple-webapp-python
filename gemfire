@@ -1,0 +1,31 @@
+import org.springframework.stereotype.Component;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+@Component
+public class TaskScheduler {
+
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+
+    public TaskScheduler() {
+        // Schedule Task One to execute every 5 minutes (300 seconds)
+        scheduler.scheduleAtFixedRate(() -> {
+            taskOne();
+
+            // Schedule Task Two to execute 20 seconds after Task One
+            scheduler.schedule(this::taskTwo, 20, TimeUnit.SECONDS);
+        }, 0, 300, TimeUnit.SECONDS);
+    }
+
+    public void taskOne() {
+        System.out.println("Task One executed at: " + System.currentTimeMillis());
+        // Add your Task One logic here
+    }
+
+    public void taskTwo() {
+        System.out.println("Task Two executed at: " + System.currentTimeMillis());
+        // Add your Task Two logic here
+    }
+}
