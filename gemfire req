@@ -1,19 +1,15 @@
-Subject: Request for CHG Approval and Execution of RLMs for GemFire Prod Environment
+Subject: Request for Approval to Create a New GemFire Region
 
-Hi Vaithi, Muthu,
+Hi Umesh,
 
-We are using GemFire for one of our services and need the production environment set up for the same. We have received the RLM details and require their execution to proceed with creating the GemFire production region.
+I hope you're doing well.
 
-We are planning this as part of the February off-cycle release. The execution of the production RLMs is a prerequisite for the GemFire team to create the Prod region. Once the region is ready and available, we can integrate it into our service in preparation for the March release.
+I’m from the Oneview team, and we are currently working on integrating GemFire caching for one of our services. As part of this integration, we require a new region to be created under the assisted shared cluster CSI 169608 for our application.
 
-Below are the RLM details:
+Could you please provide your approval so that TenantOps can proceed with the region creation?
 
-rlm1
-rlm2
-We also need a CHG request for this activity. We can refer to the existing CHG request for the same.
+Let me know if you need any additional information.
 
-Please let us know the next steps.
-
-Thanks,
+Best regards,
 [Your Name]
-[Your Team/Designation]
+Oneview Team
