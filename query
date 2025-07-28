@@ -1,4 +1,4 @@
-SELECT 
+SELECT DISTINCT
     citi_ov_roles_lobs.lob_name AS "lobName", 
     citi_ov_feats_subfeats.feature_group AS "featureGroup", 
     citi_ov_feats_subfeats.feature_name AS "featureName", 
@@ -20,4 +20,8 @@ INNER JOIN
 WHERE 
     citi_ov_feats_subfeats.feature_group IN (:featureGroups)
     AND citi_ov_feats_subfeats_roles.role_name IN (:agentRoles)
-    AND citi_ov_feats_subfeats_sg_roles.sg_role = :sgRole
+    AND (
+        (citi_ov_feats_subfeats_sg_roles.decision = 'selected' AND citi_ov_feats_subfeats_sg_roles.sg_role = :sgRole)
+        OR
+        (citi_ov_feats_subfeats_sg_roles.decision = 'inherited' AND citi_ov_feats_subfeats_sg_roles.sg_role IN (:sgAvailableRoles))
+    )
