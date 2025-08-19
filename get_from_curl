@@ -1,0 +1,39 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+public class CurlExample {
+    public static void main(String[] args) {
+        try {
+            String url = "https://NAPACPWCSQSW1P.NAM.NSROOT.NET/AIMWebService/api/Accounts" +
+                    "?AppID=OV_P_WCS_174559_User" +
+                    "&Safe=OV_P_WCS_174559_Safe" +
+                    "&Folder=Root" +
+                    "&Object=ORAAS_NAUDT1P_oraasqtp066_OV_APP_RW_CK_FID";
+
+            URL obj = new URL(url);
+            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+            // Set request method to GET
+            con.setRequestMethod("GET");
+
+            // Read response
+            int responseCode = con.getResponseCode();
+            System.out.println("Response Code : " + responseCode);
+
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()))) {
+                String inputLine;
+                StringBuilder response = new StringBuilder();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                System.out.println("Response Body: " + response.toString());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
