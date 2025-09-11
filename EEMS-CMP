@@ -1,0 +1,7 @@
+In the Role section of CMP, users can select one or more predefined static roles for their request. Our requirements are:
+
+Certain roles should be hidden in the CMP user interface but must still be automatically assigned to any user who completes or raises a CMP request. These roles remain active in the system but are not visible or selectable by users.
+
+Some roles must be pre-selected and read-only—these cannot be unselected or modified by the user and will always be included in the final list of assigned roles.
+
+For example, in CMP, a user is presented with options like "abc", "bcd", and "cde". After the user selects "abc" and completes the process, they should be assigned both "abc" and an additional hidden or pre-selected role, such as "xyz", where "xyz" is either hidden from selection or is always pre-selected and read-only.
