@@ -1,0 +1,29 @@
+FROM binaryrepo.nam.nsroot.net/docker-enterprise-prod/developersvcs-java/oracle-jdk-rhel8/17e64:17.0_15164_2025082112
+USER root
+
+# set ownership/permissions
+RUN chown -R 1001:0 /opt/appdyn && \
+    find /opt/appdyn -exec chgrp 0 {} \; && \
+    find /opt/appdyn -exec chmod g+rw {} \; && \
+    find /opt/appdyn -type d -exec chmod g+x {} \+ && \
+    mkdir -p /.ionicsecurity && chmod 775 /.ionicsecurity
+
+# install unzip (RHEL) and fetch YourKit
+RUN yum install -y unzip && yum clean all && \
+    curl --show-error --insecure -fSL -o /tmp/YourKit-JavaProfiler-2024.3-docker.zip \
+      "https://vpe.nam.nsroot.net/YourKit-JavaProfiler-2024.3-docker.zip" && \
+    unzip /tmp/YourKit-JavaProfiler-2024.3-docker.zip -d /usr/local && \
+    rm -f /tmp/YourKit-JavaProfiler-2024.3-docker.zip
+
+# copy jar and start script
+# replace my-app.jar with the exact file name in your build context
+COPY my-app.jar /tmp/sct-o-loginauthentication.jar
+COPY start-app.sh /tmp/start-app.sh
+RUN chmod 775 /tmp/start-app.sh && sed -i 's/\r$//' /tmp/start-app.sh
+
+RUN echo 'list all /usr/local files' && ls -lrt /usr/local/
+
+EXPOSE 10001
+EXPOSE 8443/tcp
+ENTRYPOINT ["/tmp/start-app.sh"]
+USER 1001
