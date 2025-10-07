@@ -1,0 +1,50 @@
+CSA:
+$3,000
+$5,000
+$10,000
+$15,000
+$20,000
+$25,000
+$50,000
+
+Department:
+CI - Billing Disputes / Account Maintenance
+CR - Credit
+FR - Fraud
+PH - Phones
+RSO
+RT - Retention
+
+
+Approval:
+0 - No Approval
+1 - All Agents
+2 - All Fraud Leaders and Supervisors
+3 - All Managers / CRT Agents
+
+
+Profile:
+0 - All Agents
+1 - All Managers / CRT Agents
+2 - All Credit and CTC Agents
+3 - All Fraud Agents
+4 - All Fraud Leaders and Supervisors
+
+
+Override:
+N - No override
+U - No Limit
+Y - Limited Override
+
+
+Credit Line:
+A - Total Exposure - $7,500  Incremental - $1,000  
+B - Total Exposure - $10,000  Incremental - $1,500  
+C - Total Exposure - $12,000  Incremental - $2,000  
+D - Total Exposure - $15,000  Incremental - $3,000  
+F - Total Exposure - $50,000  Incremental - $10,000  
+Remove Existing or Do Not Grant Credit Line Indicator  
+X - Total Exposure - $250,000  Incremental - Unlimited
+
+
+Site:
